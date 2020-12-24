@@ -82,9 +82,9 @@ args = parser.parse_args()
 data_dir = args.data_dir
 savedir = args.savedir
 arch = args.arch
-learning_rate = args.learning_rate
-epochs = args.epochs
-hidden_units = args.hidden_units
+learning_rate = float(args.learning_rate)
+epochs = int(args.epochs)
+hidden_units = int(args.hidden_units)
 gpu_available = args.gpu
 
 """
@@ -206,6 +206,8 @@ for e in range(epochs):
 		equals = top_class == labels.view(*top_class.shape)
 		train_accuracy += torch.mean(equals.type(torch.FloatTensor))
 
+		print("Step: " + str(step))
+		print("Print Every: " + str(print_every))
 		if step % print_every == 0:
 			# Test against validation set
 			valid_running_loss = 0
@@ -228,19 +230,19 @@ for e in range(epochs):
 					equals = top_class == labels.view(*top_class.shape)
 					accuracy += torch.mean(equals.type(torch.FloatTensor))
 
-					print(
-						f'Epoch {current_epoch} of {epochs} | Train loss: {running_loss / print_every:.3f} | Train acc: {train_accuracy / step:.3f} | Val. loss: {valid_running_loss / len(validloader):.3f} | Val. acc.: {accuracy / len(validloader):.3f}')
+			print(
+				f'Epoch {current_epoch} of {epochs} | Train loss: {running_loss / print_every:.3f} | Train acc: {train_accuracy / step:.3f} | Val. loss: {valid_running_loss / len(validloader):.3f} | Val. acc.: {accuracy / len(validloader):.3f}')
 
-					# Switch back to train
-					model.train()
+			# Switch back to train
+			model.train()
 
-					train_losses.append(running_loss / print_every)
-					valid_losses.append(valid_running_loss / len(validloader))
+			train_losses.append(running_loss / print_every)
+			valid_losses.append(valid_running_loss / len(validloader))
 
-					train_accuracies.append(train_accuracy / step * 100)
-					valid_accuracies.append(accuracy / len(validloader) * 100)
+			train_accuracies.append(train_accuracy / step * 100)
+			valid_accuracies.append(accuracy / len(validloader) * 100)
 
-					running_loss = 0
+			running_loss = 0
 
 checkpoint = {
 	'model_name': arch,
