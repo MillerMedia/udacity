@@ -16,6 +16,7 @@ Helper Functions
 """
 class DenseNet_Helper():
 	def __init__(self, hidden_units=512):
+		self.name = 'DenseNet'
 		self.model = models.densenet121(pretrained=True)
 		self.classifier = nn.Sequential(
 			nn.Linear(1024, hidden_units),
@@ -28,11 +29,17 @@ class DenseNet_Helper():
 			nn.LogSoftmax(dim=1)
 		)
 
-		self.model.classifier = self.classifier
-		self.optimizer_parameters = model.classifier.parameters()
+	def set_classifier(self, model):
+		model.classifier = self.classifier
+		return model
+
+	def get_optimizer_parameters(self, model):
+		return model.classifier.parameters()
+
 
 class ResNet_Helper():
-	def __init__(self, hidden_units = 512):
+	def __init__(self, hidden_units=512):
+		self.name = 'ResNet'
 		self.model = models.resnet18(pretrained=True)
 		self.classifier = nn.Sequential(
 			nn.Linear(512, hidden_units),
@@ -45,8 +52,13 @@ class ResNet_Helper():
 			nn.LogSoftmax(dim=1)
 		)
 
-		self.model.fc = self.classifier
-		self.optimizer_parameters = model.fc.parameters()
+	def set_classifier(self, model):
+		model.fc = self.classifier
+		return model
+
+	def get_optimizer_parameters(self, model):
+		return model.fc.parameters()
+
 
 parser = ArgumentParser()
 parser.add_argument('data_dir',
@@ -81,7 +93,6 @@ Valid command line arguments
 
 # I keep it broad since
 # so the user can enter 'densenet', 'densenet121' or other variations.
-
 # TODO: architecture
 if 'densenet' not in arch and 'resnet' not in arch:
 	print(
@@ -92,6 +103,8 @@ if 'densenet' in arch:
 	model_helper = DenseNet_Helper()
 elif 'resnet' in arch:
 	model_helper = ResNet_Helper()
+
+print("Using model architecture " + model_helper.name)
 
 if hidden_units >= 1023 or hidden_units <= 257:
 	print("Hidden units value must be between 257 and 1023. Please update.")
@@ -144,6 +157,8 @@ model = model_helper.model
 for param in model.parameters():
 	param.requires_grad = False
 
+model = model_helper.set_classifier(model)
+
 # Define variables for training process
 print_every = 20
 
@@ -152,7 +167,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() and gpu_available ==
 model.to(device)
 
 criterion = nn.NLLLoss()
-optimizer = optim.Adam(model_helper.optimizer_parameters, lr=learning_rate)
+optimizer = optim.Adam(model_helper.get_optimizer_parameters(model), lr=learning_rate)
 
 print("Training with " + str(device))
 print(f'Size of training set: {len(trainloader)}')
