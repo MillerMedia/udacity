@@ -36,6 +36,9 @@ class DenseNet_Helper():
 	def get_optimizer_parameters(self, model):
 		return model.classifier.parameters()
 
+	def get_state_dict(self, model):
+		return model.classifier.state_dict()
+
 
 class ResNet_Helper():
 	def __init__(self, hidden_units=512):
@@ -58,6 +61,9 @@ class ResNet_Helper():
 
 	def get_optimizer_parameters(self, model):
 		return model.fc.parameters()
+
+	def get_state_dict(self, model):
+		return model.fc.state_dict()
 
 
 parser = ArgumentParser()
@@ -245,9 +251,9 @@ for e in range(epochs):
 checkpoint = {
 	'model_name': arch,
 	'epochs': epochs,
-	'learning_rate': 0.003,
+	'learning_rate': learning_rate,
 	'classifier': model_helper.classifier,
-	'classifier_state_dict': model.classifier.state_dict(),
+	'classifier_state_dict': model_helper.get_state_dict(model),
 	'state_dict': model.state_dict(),
 	'optimizer_state_dict': optimizer.state_dict(),
 	'plot_data': {
