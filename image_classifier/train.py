@@ -206,8 +206,6 @@ for e in range(epochs):
 		equals = top_class == labels.view(*top_class.shape)
 		train_accuracy += torch.mean(equals.type(torch.FloatTensor))
 
-		print("Step: " + str(step))
-		print("Print Every: " + str(print_every))
 		if step % print_every == 0:
 			# Test against validation set
 			valid_running_loss = 0
