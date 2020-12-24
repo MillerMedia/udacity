@@ -2,13 +2,8 @@ import torch
 import json
 import sys
 import torchvision.models as models
-import torch.nn.functional as F
-import numpy as np
 from torchvision import datasets, transforms
 from torch import nn, optim, utils
-from collections import OrderedDict
-from PIL import Image
-import matplotlib.pyplot as plt
 from argparse import ArgumentParser
 
 """
