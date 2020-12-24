@@ -11,6 +11,43 @@ from PIL import Image
 import matplotlib.pyplot as plt
 from argparse import ArgumentParser
 
+"""
+Helper Functions
+"""
+class DenseNet_Helper():
+	def __init__(self, hidden_units=512):
+		self.model = models.densenet121(pretrained=True)
+		self.classifier = nn.Sequential(
+			nn.Linear(1024, hidden_units),
+			nn.ReLU(),
+			nn.Dropout(0.2),
+			nn.Linear(hidden_units, 256),
+			nn.ReLU(),
+			nn.Dropout(0.2),
+			nn.Linear(256, 102),  # 102 labels returned from CSV
+			nn.LogSoftmax(dim=1)
+		)
+
+		self.model.classifier = self.classifier
+		self.optimizer_parameters = model.classifier.parameters()
+
+class ResNet_Helper():
+	def __init__(self, hidden_units = 512):
+		self.model = models.resnet18(pretrained=True)
+		self.classifier = nn.Sequential(
+			nn.Linear(512, hidden_units),
+			nn.ReLU(),
+			nn.Dropout(0.2),
+			nn.Linear(hidden_units, 128),
+			nn.ReLU(),
+			nn.Dropout(0.2),
+			nn.Linear(128, 102),  # 102 labels returned from CSV
+			nn.LogSoftmax(dim=1)
+		)
+
+		self.model.fc = self.classifier
+		self.optimizer_parameters = model.fc.parameters()
+
 parser = ArgumentParser()
 parser.add_argument('data_dir',
 					help='Provide data directory. Mandatory argument')
@@ -50,6 +87,11 @@ if 'densenet' not in arch and 'resnet' not in arch:
 	print(
 		"This training script currently only supports 'densenet121' or 'resnet18'. Please use 'densenet' or 'resnet' as your '--arch' value.")
 	sys.exit()
+
+if 'densenet' in arch:
+	model_helper = DenseNet_Helper()
+elif 'resnet' in arch:
+	model_helper = ResNet_Helper()
 
 if hidden_units >= 1023 or hidden_units <= 257:
 	print("Hidden units value must be between 257 and 1023. Please update.")
@@ -96,33 +138,11 @@ testloader = utils.data.DataLoader(test_data, batch_size=32)
 with open('cat_to_name.json', 'r') as f:
 	cat_to_name = json.load(f)
 
-if 'densenet' in arch:
-	model = models.densenet121(pretrained=True)
-elif 'resnet' in arch:
-	model = models.resnet18(pretrained=True)
-
-print(model)
+model = model_helper.model
 
 # Freeze parameters since we are using a pre-trained network and do not need back propagation
 for param in model.parameters():
 	param.requires_grad = False
-
-classifier = nn.Sequential(
-	nn.Linear(1024, hidden_units),
-	nn.ReLU(),
-	nn.Dropout(0.2),
-	nn.Linear(hidden_units, 256),
-	nn.ReLU(),
-	nn.Dropout(0.2),
-	nn.Linear(256, 102),  # 102 labels returned from CSV
-	nn.LogSoftmax(dim=1)
-)
-
-if 'densenet' in arch:
-	model.classifier = classifier
-
-if 'resnet' in arch:
-	model.fc = classifier
 
 # Define variables for training process
 print_every = 20
@@ -132,13 +152,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() and gpu_available ==
 model.to(device)
 
 criterion = nn.NLLLoss()
-
-if 'densenet' in arch:
-	optimizer_parameters = model.classifier.parameters()
-elif 'resnet' in arch:
-	optimizer_parameters = model.fc.parameters()
-
-optimizer = optim.Adam(optimizer_parameters, lr=learning_rate)
+optimizer = optim.Adam(model_helper.optimizer_parameters, lr=learning_rate)
 
 print("Training with " + str(device))
 print(f'Size of training set: {len(trainloader)}')
@@ -217,7 +231,7 @@ checkpoint = {
 	'model_name': arch,
 	'epochs': epochs,
 	'learning_rate': 0.003,
-	'classifier': classifier,
+	'classifier': model_helper.classifier,
 	'classifier_state_dict': model.classifier.state_dict(),
 	'state_dict': model.state_dict(),
 	'optimizer_state_dict': optimizer.state_dict(),
