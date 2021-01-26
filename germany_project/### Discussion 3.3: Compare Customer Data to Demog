@@ -1,0 +1,120 @@
+# What kinds of people are part of a cluster that is underrepresented in the
+# customer data compared to the general population?
+
+# It appears clusters 3, 4, 5 and 7 are demographics NOT to target. Let's get details on them!
+cluster_3 = map_weights(pca, scaled_customers, 3)
+cluster_4 = map_weights(pca, scaled_customers, 4)
+cluster_5 = map_weights(pca, scaled_customers, 5)
+cluster_7 = map_weights(pca, scaled_customers, 7)
+
+print("===========")
+print("Cluster 3 details:")
+print("===========")
+print(cluster_3[cluster_3 > 0.21])
+print(cluster_3[cluster_3 < -0.21])
+
+print("===========")
+print("Cluster 4 details:")
+print("===========")
+print(cluster_4[cluster_4 > 0.21])
+print(cluster_4[cluster_4 < -0.21])
+
+print("===========")
+print("Cluster 5 details:")
+print("===========")
+print(cluster_5[cluster_5 > 0.21])
+print(cluster_5[cluster_5 < -0.21])
+
+print("===========")
+print("Cluster 7 details:")
+print("===========")
+print(cluster_7[cluster_7 > 0.21])
+print(cluster_7[cluster_7 < -0.21])
+
+
+### Discussion 3.3: Compare Customer Data to Demographics Data
+
+When I analyzed the weights of the components that had correlations, I used a threshold of 0.21 and -0.21 which provides the strongest correlations in these datasets.
+
+# Popular Segments
+The _popular_ segments have been printed out above. Cross-referencing the Data Dictionary, the information is:
+__________  
+Cluster 2:
+__________  
+Their financial typology is 'be prepared'. It is strongly correlated to their age.  
+
+They are not dutiful, traditional-minded or religious. They are not money-savers or financially inconspicious.
+
+ALTERSKATEGORIE_GROB (0.244443)  
+FINANZ_VORSORGER (0.226880)  
+SEMIO_PFLICHT (-0.213271)  
+SEMIO_TRADV (-0.217499)  
+FINANZ_UNAUFFAELLIGER (-0.217505)  
+SEMIO_REL (-0.223379)  
+FINANZ_SPARER (-0.237886)  
+__________  
+Cluster 6:  
+__________  
+New homeowner, multiperson household, and who's falls under the 'home ownership' finance typology. These people are strongly _not_ correlated top earners bracket.
+
+LP_STATUS_FEIN_8.0 (0.331198)  
+LP_FAMILIE_GROB_5.0 (0.240076)   
+FINANZ_HAUSBAUER (0.215400)  
+LP_STATUS_FEIN_10.0 (-0.226668)  
+
+# Unpopular Segments
+__________  
+Cluster 3:
+__________  
+Their financial typology is characterized as 'dreamful', 'family-minded', 'socially-minded', 'cultural-minded'.
+
+Their financial typology is not characterized as 'critical-minded', 'dominant-minded', 'combative attitude'. It is also strongly correlated to their gender.
+
+SEMIO_VERT (0.315794)  
+SEMIO_FAM (0.253512)  
+SEMIO_SOZ (0.252224)  
+SEMIO_KULT (0.245066)  
+SEMIO_KRIT (-0.265890)  
+SEMIO_DOM (-0.278682)  
+SEMIO_KAEM (-0.309501)  
+ANREDE_KZ (-0.340562)  
+
+__________  
+Cluster 4:
+__________ 
+They are single.
+
+They are not in a family with a child of full age. And their vacation habits are not as package tour travelers.
+
+LP_LEBENSPHASE_GROB (0.258634)  
+LP_LEBENSPHASE_FEIN (0.255283)  
+LP_FAMILIE_GROB_1.0 (0.223961)  
+ANZ_PERSONEN (0.223865)  
+LP_FAMILIE_FEIN_8.0 (-0.246836)  
+GFK_URLAUBERTYP_9.0 (-0.246836)  
+
+__________  
+Cluster 7:
+__________ 
+They are correlated with life stage.
+
+Their wealth / life stage would not be characterized as 'Mini-Jobber'. They are not a member of member of green avantgarde.  
+
+LP_LEBENSPHASE_GROB (0.222675)  
+CAMEO_DEU_2015_9D (-0.226237)  
+GREEN_AVANTGARDE (-0.246278)  
+
+__________  
+Cluster 7:
+__________ 
+Their social status is either a orientation-seeking low-income earners with a potential overlap of being a houseowner. Their energy consumption typology is 'seeking orientation'.
+
+Their energy consumption typology is not 'fair supplied. 
+
+LP_STATUS_FEIN_9.0 (0.328616)  
+ZABEOTYP_5 (0.321577)  
+LP_STATUS_FEIN_2.0 (0.289748)  
+GEBAEUDETYP_RASTER (-0.244451)  
+ZABEOTYP_3 (-0.269813)  
+
+(Double-click this cell and replace this text with your own text, reporting findings and conclusions from the clustering analysis. Can we describe segments of the population that are relatively popular with the mail-order company, or relatively unpopular with the company?)
